@@ -7,7 +7,11 @@ const {
     login, register
 } = require("../controllers/auth")
 //Login
-router.post('/login', login)
+router.post('/login', [
+    body('email').exists().withMessage("Please enter email").isEmail().withMessage("Please enter valid email"),
+    body('password').exists().withMessage("Please enter password").isLength({ min: 8 }).withMessage("Password must be 8 or more than 8 character"),
+
+], login)
 
 //Register 
 router.post('/register', [

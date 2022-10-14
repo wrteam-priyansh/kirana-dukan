@@ -8,11 +8,13 @@ const app = express()
 
 //Routes 
 const authRoute = require("./routes/auth");
+const userRoute = require("./routes/user");
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/auth", authRoute)
+app.use("/api/v1/users", userRoute)
 
 
 

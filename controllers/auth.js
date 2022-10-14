@@ -1,25 +1,71 @@
+require("dotenv").config()
 const { validationResult } = require("express-validator")
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const response = require("../utils/response")
 const { user } = require("../models")
 
 
+
 const login = async (req, res) => {
-    console.log(req.body)
-    res.json({
-        "error": false,
-        "user": {
-            "name": "Priyansh",
-            "id": "1"
+    const errors = validationResult(req);
+    //checking validation error
+    if (!errors.isEmpty()) {
+        console.log(errors.array());
+        //const errorParam = errors.array()[0].param;
+        const errorMsg = errors.array()[0].msg;
+        res.send(response.error(errorMsg));
+        return;
+    }
+
+    try {
+        const result = await user.findOne({
+            where: {
+                email: req.body.email
+            },
+
+        });
+        if (result) {
+            //check for password
+            const matchedPassword = await bcrypt.compare(req.body.password, result.password);
+            if (matchedPassword) {
+                //will create token
+                const token = jwt.sign({
+                    "email": result.email,
+                    "userId": result.id,
+                    "roleId": result.roleId
+                }, process.env.JWTTOKEN_SECRET_KEY);
+                res.send(response.success({
+                    "userId": result.id,
+                    "token": token
+                }));
+            }
+            else {
+                //password is not correct
+                res.send(response.error("Invalid email or password"));
+            }
         }
-    })
+        else {
+            res.send(response.error("Invalid email or password"));
+        }
+    }
+    catch (error) {
+        //it will be true only for sequelize error
+        if (error.errors) {
+            res.send(response.error(error.errors.map((e) => e.message)[0]));
+            return;
+        }
+        console.log(error);
+        res.send(response.error("Unable to login"));
+    }
 }
+
 
 const register = async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        res.json(response.error(errors.errors[0].msg))
+        res.send(response.error(errors.errors[0].msg))
         return;
     }
     //name,phoneNumber,password,roleId,email (fields)
@@ -34,15 +80,15 @@ const register = async (req, res) => {
             "email": req.body.email
         });
         const createdUser = { id, email, name, roleId, phoneNumber, createdAt }
-        res.json(response.success(createdUser))
+        res.send(response.success(createdUser))
 
     } catch (error) {
         if (error.errors) {
             //Error from database side (Like email not unique, Value is null)
-            res.json(response.error(error.errors[0].message))
+            res.send(response.error(error.errors[0].message))
             return;
         }
-        res.json(response.error("Unable to register account"))
+        res.send(response.error("Unable to register account"))
     }
 
 
