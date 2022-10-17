@@ -15,10 +15,12 @@ const getUserDetailsById = async (req, res) => {
     }
     try {
 
-        let result = await user.findOne({
+        const result = await user.findOne({
             where: {
                 id: userId,
             },
+            raw: true,
+            nest: true,
             include: {
                 model: shop,
                 as: 'shop',
@@ -30,14 +32,10 @@ const getUserDetailsById = async (req, res) => {
                 exclude: ['password']
             }
         })
-
-
         if (result) {
-
-            if (!result.shop) {
-                console.log("OKKN ULLL")
+            if (result.shop.id == null) {
+                delete result.shop
             }
-
             res.send(response.success(result))
         }
         else {
@@ -48,7 +46,6 @@ const getUserDetailsById = async (req, res) => {
         res.send(response.error("Failed to fetch user details"))
     }
 }
-
 
 module.exports = {
     getUserDetailsById
