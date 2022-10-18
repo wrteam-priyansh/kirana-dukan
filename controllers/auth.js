@@ -8,15 +8,7 @@ const { user } = require("../models")
 
 
 const login = async (req, res) => {
-    const errors = validationResult(req);
-    //checking validation error
-    if (!errors.isEmpty()) {
-        console.log(errors.array());
-        //const errorParam = errors.array()[0].param;
-        const errorMsg = errors.array()[0].msg;
-        res.send(response.error(errorMsg));
-        return;
-    }
+
 
     try {
         const result = await user.findOne({
@@ -63,11 +55,7 @@ const login = async (req, res) => {
 
 const register = async (req, res) => {
 
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-        res.send(response.error(errors.errors[0].msg))
-        return;
-    }
+
     //name,phoneNumber,password,roleId,email (fields)
     try {
         const hashedPassword = await bcrypt.hash(req.body.password, 12);
