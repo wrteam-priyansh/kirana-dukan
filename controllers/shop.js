@@ -28,12 +28,11 @@ const getShopDetailsById = async (req, res) => {
             return;
         }
 
-
-
         const result = await shop.findOne({
             where: {
                 id: shopId
             },
+
             include: [
                 {
                     model: city,
@@ -43,9 +42,13 @@ const getShopDetailsById = async (req, res) => {
                     model: user,
                     attributes: ['id', 'name', 'email', 'phoneNumber']
                 }
-            ]
+            ],
+            raw: true,
+            nest: true
         });
         if (result) {
+            result.seller = result.user
+            delete result.user
             res.send(response.success(result))
         }
         else {

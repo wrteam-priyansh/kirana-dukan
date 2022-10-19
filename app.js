@@ -14,6 +14,7 @@ const authRoute = require("./routes/auth");
 const userRoute = require("./routes/user");
 const cityRoute = require("./routes/city");
 const shopRoute = require("./routes/shop");
+const categoryRoute = require("./routes/category");
 
 
 app.use(express.json())
@@ -24,6 +25,7 @@ app.use(`${apiVersion}/auth`, authRoute)
 app.use(`${apiVersion}/users`, userRoute)
 app.use(`${apiVersion}/cities`, cityRoute)
 app.use(`${apiVersion}/shops`, shopRoute)
+app.use(`${apiVersion}/categories`, categoryRoute)
 
 
 
