@@ -15,6 +15,7 @@ const userRoute = require("./routes/user");
 const cityRoute = require("./routes/city");
 const shopRoute = require("./routes/shop");
 const categoryRoute = require("./routes/category");
+const measurementRoute = require("./routes/measurement");
 
 
 app.use(express.json())
@@ -26,6 +27,7 @@ app.use(`${apiVersion}/users`, userRoute)
 app.use(`${apiVersion}/cities`, cityRoute)
 app.use(`${apiVersion}/shops`, shopRoute)
 app.use(`${apiVersion}/categories`, categoryRoute)
+app.use(`${apiVersion}/measurements`, measurementRoute)
 
 
 

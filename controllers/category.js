@@ -106,7 +106,6 @@ const deleteCategory = async (req, res) => {
             res.send(response.error("Please enter valid categoryId"))
             return;
         }
-
         await category.destroy({
             where: {
                 id: categoryId
