@@ -16,6 +16,7 @@ const cityRoute = require("./routes/city");
 const shopRoute = require("./routes/shop");
 const categoryRoute = require("./routes/category");
 const measurementRoute = require("./routes/measurement");
+const productRoute = require("./routes/product");
 
 
 app.use(express.json())
@@ -28,6 +29,7 @@ app.use(`${apiVersion}/cities`, cityRoute)
 app.use(`${apiVersion}/shops`, shopRoute)
 app.use(`${apiVersion}/categories`, categoryRoute)
 app.use(`${apiVersion}/measurements`, measurementRoute)
+app.use(`${apiVersion}/products`, productRoute)
 
 
 

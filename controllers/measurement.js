@@ -84,7 +84,7 @@ const deleteMeasurement = async (req, res) => {
         res.send(response.success("Measurement deleted successfully"))
 
     } catch (error) {
-        res.send(response.error("Failed to measurement category"))
+        res.send(response.error("Failed to measurement"))
     }
 }
 
