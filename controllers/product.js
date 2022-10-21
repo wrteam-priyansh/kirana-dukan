@@ -34,7 +34,8 @@ const getAllProducts = async (req, res) => {
                     attributes: ['id', 'name', 'code']
                 }, {
                     model: productVariant,
-                    as: 'variants'
+                    as: 'variants',
+                    attributes: ['measurementValue']
                 }
             ]
         },
@@ -54,6 +55,99 @@ const getAllProducts = async (req, res) => {
     }
 }
 
+const getProductDetailsById = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        if (!parseInt(productId)) {
+            res.send(response.error("Please enter valid productId"))
+            return;
+        }
+        const result = await product.findOne({
+            where: {
+                id: productId
+            },
+            include: [
+                {
+                    model: category,
+                    attributes: ['id', 'name']
+                },
+                {
+                    model: measurement,
+                    attributes: ['id', 'name', 'code']
+                }, {
+                    model: productVariant,
+                    as: 'variants',
+                    attributes: ['measurementValue']
+                }
+            ]
+        })
+
+        if (result) {
+            res.send(response.success(result))
+        }
+        else {
+
+            res.send(response.error("Failed to get product details"))
+        }
+
+
+    } catch (error) {
+
+        res.send(response.error("Failed to get product details"))
+    }
+}
+
+const getProductVariants = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        if (!parseInt(productId)) {
+            res.send(response.error("Please enter valid productId"))
+            return;
+        }
+        const result = await productVariant.findAll({
+            where: {
+                'productId': productId
+            },
+            attributes: ['measurementValue']
+        })
+
+        if (result) {
+            res.send(response.success(result))
+        }
+        else {
+            res.send(response.error("Failed to get product variants"))
+        }
+
+
+    } catch (error) {
+
+        res.send(response.error("Failed to get product details"))
+    }
+}
+
+const addProductVariant = async (req, res) => {
+    try {
+        const productId = req.params.productId;
+        if (!parseInt(productId)) {
+            res.send(response.error("Please enter valid productId"))
+            return;
+        }
+        const result = await productVariant.create({
+            'measurementValue': req.body.measurementValue,
+            'productId': productId
+        })
+
+        if (result) {
+            res.send(response.success(result))
+        }
+        else {
+            res.send(response.error("Failed to add product variant"))
+        }
+    } catch (error) {
+        res.send(response.error("Failed to add product variant"))
+    }
+}
+
 
 
 const addProduct = async (req, res) => {
@@ -70,6 +164,80 @@ const addProduct = async (req, res) => {
         res.send(response.error("Failed to add product"))
     }
 }
+
+const editProductVariant = async (req, res) => {
+    try {
+        const productId = req.params.productId
+        if (!parseInt(productId)) {
+            res.send(response.error("Please enter valid productId"))
+            return;
+        }
+        const variantId = req.params.variantId
+        if (!parseInt(variantId)) {
+            res.send(response.error("Please enter valid variantId"))
+            return;
+        }
+
+        //It will remove empny or null values 
+        let updateFields = req.body
+        Object.keys(req.body).forEach((value) => {
+            if (updateFields[value] == "" || updateFields[value] == null) {
+                delete updateFields[value]
+            }
+        })
+
+        console.log(updateFields)
+
+        //measurementValue
+        const result = await productVariant.update(updateFields, {
+            where: {
+                'productId': productId,
+                'id': variantId
+            },
+            returning: true,
+        });
+
+        if (result) {
+
+            const updatedResult = result[1][0];//Update return [1,[{}]]
+            res.send(response.success(updatedResult))
+        }
+        else {
+            res.send(response.error("Failed to update product variant"))
+        }
+    } catch (error) {
+        res.send(response.error("Failed to update product variant"))
+    }
+}
+
+const deleteProductVariant = async (req, res) => {
+    try {
+        const productId = req.params.productId
+
+        if (!parseInt(productId)) {
+            res.send(response.error("Please enter valid productId"))
+            return;
+        }
+        const variantId = req.params.variantId
+        if (!parseInt(variantId)) {
+            res.send(response.error("Please enter valid variantId"))
+            return;
+        }
+
+        await productVariant.destroy({
+            where: {
+                'id': variantId,
+                'productId': productId
+            },
+        })
+
+        res.send(response.success("Product variant deleted successfully"))
+
+    } catch (error) {
+        res.send(response.error("Failed to delete product variant"))
+    }
+}
+
 
 const editProduct = async (req, res) => {
     try {
@@ -129,7 +297,7 @@ const deleteProduct = async (req, res) => {
             },
         })
 
-        res.send(response.success("Measurement deleted successfully"))
+        res.send(response.success("Product deleted successfully"))
 
     } catch (error) {
         res.send(response.error("Failed to product"))
@@ -139,5 +307,6 @@ const deleteProduct = async (req, res) => {
 
 
 module.exports = {
-    getAllProducts, addProduct, editProduct, deleteProduct
+    getAllProducts, addProduct, editProduct, deleteProduct, getProductDetailsById, getProductVariants,
+    addProductVariant, editProductVariant, deleteProductVariant
 }
