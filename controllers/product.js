@@ -108,7 +108,6 @@ const getProductVariants = async (req, res) => {
             where: {
                 'productId': productId
             },
-            attributes: ['measurementValue']
         })
 
         if (result) {

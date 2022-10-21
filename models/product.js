@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
           name: 'measurementId'
         }
       })
+
       this.hasMany(productVariant, {
         //To use alias 
         as: 'variants',
@@ -27,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
           name: 'productId'
         }
       })
+
+
+
+
     }
   }
   product.init({

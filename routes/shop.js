@@ -5,7 +5,7 @@ const validateRequestBody = require("../middlewares/validateRequestBody")
 const { body } = require("express-validator")
 
 const {
-    createShop, getShopDetailsById
+    createShop, getShopDetailsById, addShopProduct
 } = require("../controllers/shop")
 
 router.get("/:shopId", vefiryAuthencity, getShopDetailsById)
@@ -20,5 +20,14 @@ router.post("/create", vefiryAuthencity, [
     body('userId').exists().withMessage('Please enter userId').isInt().withMessage("Please enter valid userId"),
 
 ], validateRequestBody, createShop)
+router.post("/:shopId/products/add", vefiryAuthencity, [
+
+    //price,productVariantId
+    body('price').exists().withMessage('Please enter price').isString().withMessage("Please enter proper shop name"),
+    body('productVariantId').exists().withMessage('Please enter productVariantId').isInt().withMessage("Please enter valid productVariantId"),
+], validateRequestBody, addShopProduct)
+
+
+
 
 module.exports = router
