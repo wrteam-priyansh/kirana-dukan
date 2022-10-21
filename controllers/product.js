@@ -1,47 +1,43 @@
 const response = require("../utils/response")
 const { product, category, measurement, productVariant } = require("../models")
+const { Op } = require("sequelize")
 
 const getAllProducts = async (req, res) => {
     try {
-        const categoryId = req.query.categoryId
 
-        let result;
+        //measurementId, categoryId, searchKey
+        let queryParameters = req.query
 
-
-
-        /*
-
-    const result = await product.findAll(
-        {
-            where: {
-                'categoryId': categoryId
-            }
-        },
-        {
-            include: [
-
-                {
-                    model: 'measurements'
-                }, {
-                    model: 'productVariants',
+        //Checking the keys 
+        if (queryParameters.searchKey != null || queryParameters.categoryId != null || queryParameters.measurementId != null) {
+            if (queryParameters.searchKey != null) {
+                const nameToSearch = queryParameters.searchKey;
+                queryParameters['name'] = {
+                    [Op.iLike]: `%${nameToSearch}%`
                 }
-            ]
+                delete queryParameters.searchKey
+            }
         }
-    )
-        */
+        else {
+            queryParameters = {}
+        }
 
-        result = await product.findAll({
+        const result = await product.findAll({
+            where: queryParameters,
             include: [
                 {
-                    model: category
+                    model: category,
+                    attributes: ['id', 'name']
                 },
                 {
-                    model: measurement
+                    model: measurement,
+                    attributes: ['id', 'name', 'code']
                 }, {
                     model: productVariant,
+                    as: 'variants'
                 }
             ]
-        }
+        },
         )
 
         //
@@ -53,49 +49,11 @@ const getAllProducts = async (req, res) => {
             res.send(response.error("Failed to get products"))
         }
     } catch (error) {
-        console.log(error)
+        //console.log(error)
         res.send(response.error("Failed to get products"))
     }
 }
 
-// const getAllProductsByCategoryId = async (req, res) => {
-//     try {
-
-//         const categoryId = req.query.categoryId
-//         if (!parseInt(categoryId)) {
-//             res.send(response.error("Please enter valid categoryId"))
-//             return;
-//         }
-
-
-//         const result = await product.findAll(
-//             {
-//                 where: {
-//                     'categoryId': categoryId
-//                 }
-//             },
-//             {
-//                 include: [
-
-//                     {
-//                         model: 'measurements'
-//                     }, {
-//                         model: 'productVariants',
-//                     }
-//                 ]
-//             }
-//         )
-//         if (result) {
-//             res.send(response.success(result))
-//         }
-//         else {
-
-//             res.send(response.error("Failed to get products"))
-//         }
-//     } catch (error) {
-//         res.send(response.error("Failed to get products"))
-//     }
-// }
 
 
 const addProduct = async (req, res) => {

@@ -21,6 +21,8 @@ module.exports = (sequelize, DataTypes) => {
         }
       })
       this.hasMany(productVariant, {
+        //To use alias 
+        as: 'variants',
         foreignKey: {
           name: 'productId'
         }
